@@ -18,7 +18,9 @@ interface data {
     readMoreUrl: string,
     time: string,
     title: string,
-    url: string
+    url: string,
+    [key: string]: string
+
 }
 const newsCategories = [
     "all",
@@ -37,8 +39,8 @@ const newsCategories = [
 
 let likedMap = new Map<string, number>();
 let likedArr: string[] = [];
-let SavedNewsArr: {id:string,html:string}[] = [];
-
+let SavedNewsArr: { id: string, obj: data }[] = [];
+let fetchedData: data[] = [];
 
 if (localStorage.getItem("liked")) {
     likedArr = JSON.parse(localStorage.getItem("liked")!);
@@ -47,18 +49,8 @@ if (localStorage.getItem("liked")) {
         likedMap.set(str, i);
     })
 }
-renderNewOrOldNews(0);
+FetchData(0);
 
-function renderNewOrOldNews(id: number) {
-    let localNews = localStorage.getItem(newsCategories[id]);
-    if (localNews) {
-        renderHtml(JSON.parse(localNews) as data[]);
-        loading.style.display = "none";
-        news.style.display = "flex";
-    } else {
-        FetchData(id);
-    }
-}
 async function FetchData(id: number) {
     let url = new URL("https://inshorts.deta.dev/news");
     url.searchParams.set("category", newsCategories[id]);
@@ -67,8 +59,8 @@ async function FetchData(id: number) {
     try {
         let res = await fetch(url);
         let JsonRes: Res = await res.json();
-        renderHtml(JsonRes.data);
-        localStorage.setItem(newsCategories[id], JSON.stringify(JsonRes.data));
+        fetchedData = JsonRes.data;
+        renderHtml(JsonRes.data, newsCategories[id]);
     } catch (error) {
         alert("Something going wrong on backend");
         console.log(error);
@@ -78,15 +70,19 @@ async function FetchData(id: number) {
         news.style.display = "flex";
     }
 }
-function renderHtml(data: data[]) {
+function renderHtml(data: data[], category: string) {
     news.innerHTML = "";
-    data.forEach(obj => {
+    data.forEach((obj, i) => {
+        if (category != "") {
+            obj.category = category
+        }
         let div = document.createElement("div");
         div.className = "card";
         div.id = obj.id;
         div.innerHTML = `
-          <div class="img" style="background-image: url(${obj.imageUrl ? obj.imageUrl : "/img/default.jpg"});"></div>
-          <div class="details">
+        <div class="img" style="background-image: url(${obj.imageUrl ? obj.imageUrl : "/img/default.jpg"});"></div>
+        <div class="details">
+            <p class="category">category <span>${obj.category}</span></p>
             <h2 class="title">
               ${obj.title}
             </h2>
@@ -100,27 +96,27 @@ function renderHtml(data: data[]) {
                   chevron_right
                 </span></a
               >
-              <span class="material-symbols-outlined ${likedMap.has(obj.id) ? "fill" : ""} heart" onclick="likeDisLiked(this)"}> favorite </span>
+              <span class="material-symbols-outlined ${likedMap.has(obj.title) ? "fill" : ""} heart" onclick="likeDisLiked(this,${i})"}> favorite </span>
             </div>
           </div>`
         news.appendChild(div);
     })
 }
 
-function likeDisLiked(el: HTMLSpanElement) {
+function likeDisLiked(el: HTMLSpanElement, i: number) {
     let card = el.parentElement?.parentElement?.parentElement!;
     el.classList.toggle("fill");
-    if (likedMap.has(card.id)) {
-        likedMap.delete(card.id);
-        likedArr.splice(likedMap.get(card.id)!, 1)
-        SavedNewsArr.splice(likedMap.get(card.id)!, 1)
+    if (likedMap.has(card.querySelector(".title")!.textContent!.trim())) {
+        likedMap.delete(card.querySelector(".title")!.textContent!.trim());
+        likedArr.splice(likedMap.get(card.querySelector(".title")!.textContent!.trim())!, 1)
+        SavedNewsArr.splice(likedMap.get(card.querySelector(".title")!.textContent!.trim())!, 1)
     } else {
-        likedMap.set(card.id, likedArr.length);
-        likedMap.set(card.id, likedArr.length);
-        likedArr.push(card.id);
-        SavedNewsArr.push({id:card.id, html:card.innerHTML.trim()});
-        console.log(card);
-        
+        likedMap.set(card.querySelector(".title")!.textContent!.trim(), likedArr.length);
+        likedMap.set(card.querySelector(".title")!.textContent!.trim(), likedArr.length);
+        likedArr.push(card.querySelector(".title")!.textContent!.trim());
+        SavedNewsArr.push({ id: card.querySelector(".title")!.textContent!.trim(), obj: fetchedData[i] });
+        console.log();
+
     }
     localStorage.setItem("liked", JSON.stringify(likedArr));
     localStorage.setItem("savedNews", JSON.stringify(SavedNewsArr));
@@ -132,7 +128,7 @@ document.querySelectorAll<HTMLLIElement>(".nav-list-item").forEach(li => {
         document.querySelector(".active")?.classList.remove("active");
         li.classList.add("active");
         categoryName.textContent = `Category : ${newsCategories[Number(li.id)]}`
-        renderNewOrOldNews(Number(li.id));
+        FetchData(Number(li.id));
     })
 });
 
@@ -143,15 +139,13 @@ NewNews.addEventListener("click", e => {
     console.log(id);
 
 });
-savedNews.addEventListener("click",()=>{
+savedNews.addEventListener("click", () => {
     categoryName.textContent = "Saved News"
     document.querySelector(".active")?.classList.remove("active");
-    news.innerHTML = "";
-    SavedNewsArr.forEach((obj)=>{
-        let div = document.createElement("div");
-        div.className = "card";
-        div.id = obj.id;
-        div.innerHTML = obj.html;
-        news.appendChild(div);
-    })
+    let temp: data[] = [];
+    SavedNewsArr.forEach(obj => {
+        temp.push(obj.obj);
+    });
+    renderHtml(temp, "");
+
 })

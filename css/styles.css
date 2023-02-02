@@ -174,7 +174,7 @@ nav {
 
 .news {
     overflow-y: scroll;
-    height: calc(100vh - 300px);
+    height: calc(100vh - 350px);
     display: none;
     align-items: center;
     flex-direction: column;

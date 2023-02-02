@@ -49,7 +49,21 @@ if (localStorage.getItem("liked")) {
         likedMap.set(str, i);
     })
 }
-FetchData(0);
+let isSavedNews = window.location.pathname.includes("savednews.html")
+if (isSavedNews) {
+    categoryName.textContent = "Saved News"
+    document.querySelector(".active")?.classList.remove("active");
+    let temp: data[] = [];
+    SavedNewsArr.forEach(obj => {
+        temp.push(obj.obj);
+    });
+    navList.style.display = "none";
+    loading.style.display = "none";
+    news.style.display = "flex";
+    renderHtml(temp, "");
+} else {
+    FetchData(0);
+}
 
 async function FetchData(id: number) {
     let url = new URL("https://inshorts.deta.dev/news");
@@ -109,7 +123,10 @@ function likeDisLiked(el: HTMLSpanElement, i: number) {
     if (likedMap.has(card.querySelector(".title")!.textContent!.trim())) {
         likedMap.delete(card.querySelector(".title")!.textContent!.trim());
         likedArr.splice(likedMap.get(card.querySelector(".title")!.textContent!.trim())!, 1)
-        SavedNewsArr.splice(likedMap.get(card.querySelector(".title")!.textContent!.trim())!, 1)
+        SavedNewsArr.splice(likedMap.get(card.querySelector(".title")!.textContent!.trim())!, 1);
+        if (isSavedNews) {
+            card.remove();
+        }
     } else {
         likedMap.set(card.querySelector(".title")!.textContent!.trim(), likedArr.length);
         likedMap.set(card.querySelector(".title")!.textContent!.trim(), likedArr.length);
@@ -133,6 +150,10 @@ document.querySelectorAll<HTMLLIElement>(".nav-list-item").forEach(li => {
 });
 
 NewNews.addEventListener("click", e => {
+    if (isSavedNews) {
+        window.location.pathname = "/news.html";
+        return;
+    }
     e.preventDefault();
     let id = document.querySelector(".active")!.id
     FetchData(Number(id));
@@ -140,12 +161,8 @@ NewNews.addEventListener("click", e => {
 
 });
 savedNews.addEventListener("click", () => {
-    categoryName.textContent = "Saved News"
-    document.querySelector(".active")?.classList.remove("active");
-    let temp: data[] = [];
-    SavedNewsArr.forEach(obj => {
-        temp.push(obj.obj);
-    });
-    renderHtml(temp, "");
+    if (!isSavedNews) {
+        window.location.pathname = "/savednews.html";
+    }
 
 })

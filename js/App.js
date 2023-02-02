@@ -32,7 +32,22 @@ if (localStorage.getItem("liked")) {
         likedMap.set(str, i);
     });
 }
-FetchData(0);
+let isSavedNews = window.location.pathname.includes("savednews.html");
+if (isSavedNews) {
+    categoryName.textContent = "Saved News";
+    document.querySelector(".active")?.classList.remove("active");
+    let temp = [];
+    SavedNewsArr.forEach(obj => {
+        temp.push(obj.obj);
+    });
+    navList.style.display = "none";
+    loading.style.display = "none";
+    news.style.display = "flex";
+    renderHtml(temp, "");
+}
+else {
+    FetchData(0);
+}
 async function FetchData(id) {
     let url = new URL("https://inshorts.deta.dev/news");
     url.searchParams.set("category", newsCategories[id]);
@@ -92,6 +107,9 @@ function likeDisLiked(el, i) {
         likedMap.delete(card.querySelector(".title").textContent.trim());
         likedArr.splice(likedMap.get(card.querySelector(".title").textContent.trim()), 1);
         SavedNewsArr.splice(likedMap.get(card.querySelector(".title").textContent.trim()), 1);
+        if (isSavedNews) {
+            card.remove();
+        }
     }
     else {
         likedMap.set(card.querySelector(".title").textContent.trim(), likedArr.length);
@@ -114,17 +132,17 @@ document.querySelectorAll(".nav-list-item").forEach(li => {
     });
 });
 NewNews.addEventListener("click", e => {
+    if (isSavedNews) {
+        window.location.pathname = "/news.html";
+        return;
+    }
     e.preventDefault();
     let id = document.querySelector(".active").id;
     FetchData(Number(id));
     console.log(id);
 });
 savedNews.addEventListener("click", () => {
-    categoryName.textContent = "Saved News";
-    document.querySelector(".active")?.classList.remove("active");
-    let temp = [];
-    SavedNewsArr.forEach(obj => {
-        temp.push(obj.obj);
-    });
-    renderHtml(temp, "");
+    if (!isSavedNews) {
+        window.location.pathname = "/savednews.html";
+    }
 });

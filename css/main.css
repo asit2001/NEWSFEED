@@ -36,17 +36,17 @@ body::after{
     z-index: -1;
 }
 .container{
-    /* display: flex; */
     width: 900px;
     height: 80vh;
     padding: 10px;
     border-radius: 10px;
     margin: 5px;
-    -webkit-box-shadow: -3px 3px 5px 0px rgba(0, 0, 0, 0.56);
-    -moz-box-shadow: -3px 3px 5px 0px rgba(0, 0, 0, 0.56);
-    box-shadow: -3px 3px 5px 0px rgba(0, 0, 0, 0.56);
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
+    -webkit-box-shadow: rgba(148, 148, 148, 0.89) 1px -1px 2px 1px,
+    #a2a2a2 -3px 3px 2px 0px;;
+    -moz-box-shadow: rgba(148, 148, 148, 0.89) 1px -1px 2px 1px,
+    #a2a2a2 -3px 3px 2px 0px;;
+    box-shadow: rgba(148, 148, 148, 0.89) 1px -1px 2px 1px,
+    #a2a2a2 -3px 3px 2px 0px;;
 }
 .buttons {
     display: flex;
@@ -79,3 +79,44 @@ h1,
 h2 {
     margin: 10px;
 }
+.handWriting{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+@-webkit-keyframes svg-text-anim {
+    40% {
+       stroke-dashoffset: 0;
+       fill: transparent;
+     }
+     60% {
+       stroke-dashoffset: 0;
+       fill: #000;
+     }
+     100% {
+       stroke-dashoffset: 0;
+       fill: #000;
+     }
+     
+ }
+ @keyframes svg-text-anim {
+    40% {
+       stroke-dashoffset: 0;
+       fill: transparent;
+     }
+     60% {
+       stroke-dashoffset: 0;
+       fill: #000;
+     }
+     100% {
+       stroke-dashoffset: 0;
+       fill: #000;
+     }
+     
+ }
+
+ @media screen and (max-width:900px) {
+    .container{
+        width: 95%;
+    }
+ }

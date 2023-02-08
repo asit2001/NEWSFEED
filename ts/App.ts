@@ -105,7 +105,7 @@ function renderHtml(data: data[], category: string) {
             ${obj.content}
             </p>
             <div class="btn-icons">
-              <a href="${obj.readMoreUrl}" class="more"
+              <a href="${obj.readMoreUrl}" target="_blank" rel="noopener noreferrer" class="more${obj.readMoreUrl == null ? " v-none":""}"
                 >Read More<span class="material-symbols-outlined">
                   chevron_right
                 </span></a

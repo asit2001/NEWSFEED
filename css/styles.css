@@ -153,7 +153,9 @@ nav {
     background-repeat: no-repeat;
     animation: dots-animation 1s infinite linear;
 }
-
+.v-none{
+    visibility: hidden;
+}
 @keyframes dots-animation {
     20% {
         background-position: 0% 0%, 50% 50%, 100% 50%;

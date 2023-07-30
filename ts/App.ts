@@ -66,7 +66,7 @@ if (isSavedNews) {
 }
 
 async function FetchData(id: number) {
-    let url = new URL("https://inshorts.deta.dev/news");
+    let url = new URL("https://news-api-ijwa.onrender.com/news");
     url.searchParams.set("category", newsCategories[id]);
     news.style.display = "none";
     loading.style.display = "flex";

@@ -49,8 +49,7 @@ else {
     FetchData(0);
 }
 async function FetchData(id) {
-    let url = new URL("https://news-api-ijwa.onrender.com/news");
-    url.searchParams.set("category", newsCategories[id]);
+    let url = new URL("https://in-short-api-u2nd.vercel.app/api/"+ newsCategories[id]);
     news.style.display = "none";
     loading.style.display = "flex";
     try {
